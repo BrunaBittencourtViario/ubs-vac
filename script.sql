@@ -1,28 +1,34 @@
+SET character_set_client = 'utf8mb4';
+SET character_set_connection = 'utf8mb4';
+SET character_set_results = 'utf8mb4';
+SET collation_connection = 'utf8mb4_unicode_ci';
+SET collation_server = 'utf8mb4_unicode_ci';
+
 -- Criando o banco de dados 'login'
-CREATE DATABASE login CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;;
+CREATE DATABASE IF NOT EXISTS login CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Selecionando o banco de dados 'login'
-USE login ;
+USE login;
 
 -- Criando a tabela 'usuarios'
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255),
     password VARCHAR(255)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Inserindo o dado padrão na tabela 'usuarios'
 INSERT INTO usuarios (email, password) 
 VALUES ('user@gmail.com', '123456');
 
 -- Criando o banco de dados 'ubs'
-CREATE DATABASE ubs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;;
+CREATE DATABASE IF NOT EXISTS ubs CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Selecionando o banco de dados 'ubs'
-USE ubs ;
+USE ubs;
 
 -- Criando a tabela 'ubs'
-CREATE TABLE ubs (
+CREATE TABLE IF NOT EXISTS ubs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255),
     endereco VARCHAR(255),
@@ -30,7 +36,7 @@ CREATE TABLE ubs (
     longitude VARCHAR(255),
     horario_atendimento VARCHAR(50),
     telefone VARCHAR(20)
-)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Inserindo os dados na tabela 'ubs'
 INSERT INTO ubs (nome, endereco, latitude, longitude, horario_atendimento, telefone) VALUES
@@ -219,3 +225,5 @@ INSERT INTO ubs_vacinas (ubs_id, vacina_id) VALUES
 (47, 5),
 (47, 18),
 (48, 3);
+
+SET NAMES 'utf8mb4';

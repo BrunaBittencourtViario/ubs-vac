@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState();
     const [ubsList, setUbsList] = useState([]);
     const [vacinasList, setVacinasList] = useState([]);
+    const [feedbackList, setFeedbackList] = useState([]);
     const [userLocation, setUserLocation] = useState({ latitude: null, longitude: null });
 
     const updateUserLocation = (latitude, longitude) => {
@@ -63,14 +64,25 @@ export const AuthProvider = ({ children }) => {
 
     const getUbs = useCallback(async () => {
         try {
+            console.log("Buscando dados das UBS...");
             const response = await axios.get("http://localhost:8800/ubs");
-            setUbsList(response.data);
+            
+            console.log("Resposta recebida:", response);
+            
+            // Assumindo que response.data já seja um array de UBS
+            const parsedData = response.data;
+            console.log("Dados das UBS recebidos:", parsedData);    
+            setUbsList(parsedData);
         } catch (error) {
             if (error.response) {
+                console.error("Erro na resposta da API:", error.response);
                 return "Erro ao buscar lista de UBSs";
+            } else {
+                console.error("Erro na requisição:", error);
             }
         }
     }, []);
+    
 
     const getUbsWithVacinas = useCallback(async () => {
         try {
@@ -83,9 +95,40 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    const getFeedbacks = useCallback(async () => {
+        try {
+            const response = await axios.get("http://localhost:8800/feedback");
+            console.log("Feedbacks recebidos:", response.data);  // Verifique os dados retornados pela API
+            
+            setFeedbackList(response.data);  // Atualize o estado feedbackList com os dados da API
+            
+            // Verifique a atualização do estado logo após a chamada de setFeedbackList
+            console.log("Feedback list após atualização:", feedbackList);  // Log para verificar se o estado foi atualizado corretamente
+            
+        } catch (error) {
+            console.error("Erro ao buscar feedbacks:", error);
+            return "Erro ao buscar feedbacks";
+        }
+    }, []);
+
+    const createFeedback = async (comment) => {
+        try {
+            const response = await axios.post("http://localhost:8800/feedback", { comment });
+            if (response.status === 201) {
+                await getFeedbacks(); 
+                return "Feedback enviado com sucesso";
+            }
+            return "Erro ao enviar feedback";
+        } catch (error) {
+            console.error("Erro ao enviar feedback:", error);
+            return "Erro ao enviar feedback";
+        }
+    };
+
     return (
         <AuthContext.Provider
-        value={{ user, signed: !!user, signin, signup, signout, getUbs, getUbsWithVacinas, ubsList, vacinasList,  userLocation, setUserLocation: updateUserLocation   }}
+        value={{ user, signed: !!user, signin, signup, signout, getUbs, getUbsWithVacinas,getFeedbacks,
+            createFeedback, ubsList, vacinasList,feedbackList,  userLocation, setUserLocation: updateUserLocation   }}
         >
             {children}
         </AuthContext.Provider>

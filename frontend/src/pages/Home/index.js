@@ -50,7 +50,7 @@ const Home = () => {
           <Button Text="Vacinas" onClick={() => [getUbsWithVacinas(), navigate("/vacinas")]} />
         </C.ContentMenu>
         <C.ContentMenu>
-          <Button Text="Feedback" onClick={() => [signout(), navigate("/feedback")]} />
+          <Button Text="Feedback" onClick={() => [ navigate("/feedback")]} />
         </C.ContentMenu>
         <C.ContentMenu>
           <Button Text="Sair" onClick={() => [signout(), navigate("/")]} />

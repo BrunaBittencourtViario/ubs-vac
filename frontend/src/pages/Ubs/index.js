@@ -11,8 +11,9 @@ const Ubs = () => {
   const [filteredUbs, setFilteredUbs] = useState([]); 
   const navigate = useNavigate();
 
+  // Cálculo da distância entre duas coordenadas (em km)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
+    const R = 6371; // Raio da Terra em km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -24,26 +25,38 @@ const Ubs = () => {
     return R * c;
   };
 
-  const clearInput = () => {
-    setNome('');
-  };
+  // Limpa o campo de pesquisa
+  const clearInput = () => setNome('');
+
+  // Verifica se a localização do usuário está carregada
+  const isLocationAvailable = userLocation && userLocation.latitude && userLocation.longitude;
 
   useEffect(() => {
     getUbs();
+    console.log("ubsList:", ubsList);
   }, [getUbs]);
 
-  const filteredList = ubsList.filter((ubs) => ubs.nome.toLowerCase().includes(nome.toLowerCase()));
   
+
+  // Filtra a lista de UBSs pelo nome
+  const filteredList = ubsList.filter((ubs) => ubs.nome.toLowerCase().includes(nome.toLowerCase()));
+
+  // Ordena a lista de UBSs pela distância mais próxima
   const sortedUbs = filteredList
     .map((ubs) => {
-      const lat1 = userLocation.latitude.latitude;
-      const lon1 = userLocation.latitude.longitude;
-      const lat2 = parseFloat(ubs.latitude.trim());
-      const lon2 = parseFloat(ubs.longitude.trim());
-      const distance = calculateDistance(lat1, lon1, lat2, lon2);
-      return { ...ubs, distance };
+      if (isLocationAvailable) {
+        const lat1 = userLocation.latitude;
+        const lon1 = userLocation.longitude;
+        const lat2 = parseFloat(ubs.latitude.trim());
+        const lon2 = parseFloat(ubs.longitude.trim());
+        const distance = calculateDistance(lat1, lon1, lat2, lon2);
+        return { ...ubs, distance };
+      } else {
+        return { ...ubs, distance: Infinity }; // Se a localização não estiver disponível, coloca uma distância infinita
+      }
     })
-    .sort((a, b) => a.distance - b.distance); 
+    .sort((a, b) => a.distance - b.distance); // Ordena pela distância
+
   return (
     <C.Container>
       <C.Menu>
@@ -54,7 +67,7 @@ const Ubs = () => {
           <Button Text="Home" onClick={() => [getUbs(), navigate("/home")]} />
         </C.ContentMenu>
         <C.ContentMenu>
-        <Button Text="Encontrar UBS" onClick={() => [getUbs(), navigate("/ubs")]} />
+          <Button Text="Encontrar UBS" onClick={() => [getUbs(), navigate("/ubs")]} />
         </C.ContentMenu>
         <C.ContentMenu>
           <Button Text="Vacinas" onClick={() => [getUbsWithVacinas(), navigate("/vacinas")]} />
@@ -86,11 +99,11 @@ const Ubs = () => {
             {sortedUbs.map((ubs) => {
               return (
                 <C.UbsItem key={ubs.id}>
-                  <p><b>UBS decodeText({ubs.nome})</b></p>
-                  <p><b>Endereço:</b> decodeText({ubs.endereco})</p>
-                  <p><b>Horário:</b> De segunda à sexta das decodeText({ubs.horario_atendimento}).</p>
+                  <p><b>UBS {ubs.nome}</b></p>
+                  <p><b>Endereço:</b> {ubs.endereco}</p>
+                  <p><b>Horário:</b> De segunda à sexta das {ubs.horario_atendimento}.</p>
                   <p><b>Telefone:</b> {ubs.telefone}</p>
-                  <p><b>Distância:</b> {ubs.distance.toFixed(2)} km</p>
+                  <p><b>Distância:</b> {ubs.distance !== Infinity ? ubs.distance.toFixed(2) : "Localização não disponível"} km</p>
                 </C.UbsItem>
               );
             })}
